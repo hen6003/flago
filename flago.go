@@ -3,26 +3,34 @@ package flago
 import (
 	"errors"
 	"os"
+	"strings"
 )
+
+func AllFlags() []string {
+	var flags []string
+
+	for _, v := range os.Args[1:] {
+		if v == "-" {
+		} else if string(v[0]) == "-" {
+			v = strings.Replace(v, "-", "", -1)
+			flags = append(flags, v)
+		}
+	}
+
+	return flags
+}
 
 // CheckFlags checks the flags against what flags you want
 func CheckFlags(list []string) ([]bool, error) {
-	args := os.Args[1:]
+	args := AllFlags()
 
 	info := make([]bool, len(list))
 
 	for _, v := range args {
 		for i, s := range list {
-			switch len(s) {
-			case 0:
-				err := errors.New("0 width string")
+			if len(s) == 0 {
+				err := errors.New("0 length string")
 				return info, err
-
-			case 1:
-				s = "-" + s
-
-			default:
-				s = "--" + s
 			}
 
 			if v == s {
